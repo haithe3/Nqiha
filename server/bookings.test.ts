@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appRouter } from "./routers";
+import { appRouter, calculateBookingTotal } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
 function contextFor(role: "user" | "admin"): TrpcContext {
@@ -12,6 +12,10 @@ function contextFor(role: "user" | "admin"): TrpcContext {
 }
 
 describe("bookings access control", () => {
+  it("calculates the authoritative total on the server", () => {
+    expect(calculateBookingTotal("الباقة الكاملة", "سيدان")).toEqual({ travelFee: 0, totalPrice: 1700 });
+  });
+
   it("rejects regular users from the admin booking list", async () => {
     const caller = appRouter.createCaller(contextFor("user"));
     await expect(caller.bookings.list()).rejects.toMatchObject({ code: "FORBIDDEN" });

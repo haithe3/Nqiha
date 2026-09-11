@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, not } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { bookings, InsertBooking, InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -92,6 +92,8 @@ export async function getUserByOpenId(openId: string) {
 export async function createBooking(booking: InsertBooking) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
+  const conflict = await db.select({ id: bookings.id }).from(bookings).where(and(eq(bookings.bookingDate, booking.bookingDate), eq(bookings.bookingTime, booking.bookingTime), not(eq(bookings.status, "cancelled")))).limit(1);
+  if (conflict.length > 0) throw new Error("هذا الموعد محجوز بالفعل، اختر وقتاً آخر");
   const result = await db.insert(bookings).values(booking);
   return Number(result[0].insertId);
 }
@@ -105,6 +107,9 @@ export async function listBookings() {
 export async function updateBookingStatus(id: number, status: "pending" | "confirmed" | "completed" | "cancelled") {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
-  await db.update(bookings).set({ status }).where(eq(bookings.id, id));
+  const current = await db.select({ bookingDate: bookings.bookingDate, bookingTime: bookings.bookingTime }).from(bookings).where(eq(bookings.id, id)).limit(1);
+  if (!current[0]) throw new Error("الحجز غير موجود");
+  const slotKey = status === "cancelled" ? `cancelled-${id}` : `${current[0].bookingDate}|${current[0].bookingTime}`;
+  await db.update(bookings).set({ status, slotKey }).where(eq(bookings.id, id));
   return { success: true } as const;
 }

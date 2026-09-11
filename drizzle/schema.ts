@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, index, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -33,6 +33,7 @@ export const bookings = mysqlTable("bookings", {
   carType: varchar("carType", { length: 80 }).notNull(),
   bookingDate: varchar("bookingDate", { length: 24 }).notNull(),
   bookingTime: varchar("bookingTime", { length: 40 }).notNull(),
+  slotKey: varchar("slotKey", { length: 80 }).unique(),
   address: text("address").notNull(),
   latitude: varchar("latitude", { length: 32 }),
   longitude: varchar("longitude", { length: 32 }),
@@ -41,7 +42,10 @@ export const bookings = mysqlTable("bookings", {
   paymentMethod: mysqlEnum("paymentMethod", ["cash", "cib", "baridimob"]).notNull(),
   status: mysqlEnum("status", ["pending", "confirmed", "completed", "cancelled"]).default("pending").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
+}, (table) => ({
+  scheduleIdx: index("bookings_schedule_idx").on(table.bookingDate, table.bookingTime, table.status),
+  statusIdx: index("bookings_status_idx").on(table.status),
+}));
 
 export type Booking = typeof bookings.$inferSelect;
 export type InsertBooking = typeof bookings.$inferInsert;
