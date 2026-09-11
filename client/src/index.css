@@ -13,6 +13,8 @@ button.bg-\[\#073b63\] { color: #fff !important; }
 .container { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
 .brand-mark { display:flex; height:43px; width:43px; align-items:center; justify-content:center; border-radius:15px 15px 15px 5px; background:linear-gradient(135deg,#35c3d0,#168b9d); color:white; box-shadow:0 8px 18px #35c3d044; transform:rotate(-7deg); }
 .brand-mark svg { transform:rotate(7deg); }.brand-mark.small { width:35px;height:35px;border-radius:12px 12px 12px 4px; }
+.brand-mark.logo-image { overflow:hidden; border-radius:0; background:transparent; box-shadow:none; transform:none; }
+.brand-mark.logo-image img { width:100%; height:100%; object-fit:contain; }
 .hero-grid { background: radial-gradient(circle at 86% 18%, #e4f8f8 0, transparent 27%), linear-gradient(180deg,#f9fdfd 0%,#f1fafb 100%); }
 .hero-grid:after { content:""; position:absolute; inset:auto 0 0; height:90px; background:linear-gradient(180deg,transparent,#f7fbfc); pointer-events:none; }
 .hero-orb { background: radial-gradient(circle at 35% 30%,#d9f7f8,#b6e9eb 55%,#8fd7de); filter:blur(1px); opacity:.8; }
