@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Check, Clock3, Download, Droplets, MapPin, Menu, Phone, ShieldCheck, Sparkles, Star, Truck, X, ChevronDown } from "lucide-react";
+import { ArrowLeft, Check, Clock3, Download, Droplets, MapPin, Menu, Phone, Share2, ShieldCheck, Sparkles, Star, Truck, Volume2, VolumeX, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { MapView } from "@/components/Map";
@@ -40,6 +40,7 @@ export default function Home() {
   const [selectedCar, setSelectedCar] = useState(carTypes[0].label);
   const [confirmed, setConfirmed] = useState(false);
   const [bookingReference, setBookingReference] = useState<string | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(false);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [bookingForm, setBookingForm] = useState({ customerName: "", phone: "", address: "", bookingDate: new Date().toISOString().slice(0, 10), bookingTime: "10:00 صباحًا", paymentMethod: "cash" as "cash" | "cib" | "baridimob" });
@@ -84,6 +85,49 @@ export default function Home() {
     });
   };
   const downloadReceipt = () => window.print();
+
+  const bookingShareText = `حجز نقيها\nالرقم المرجعي: ${bookingReference ?? "—"}\nالخدمة: ${selectedService}\nالسيارة: ${selectedCar}\nالموعد: ${bookingForm.bookingDate} - ${bookingForm.bookingTime}\nالعنوان: ${bookingForm.address}\nالمجموع: ${totalWithTravel.toLocaleString()} دج`;
+
+  const shareBooking = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "حجز نقيها", text: bookingShareText });
+      } else {
+        await navigator.clipboard?.writeText(bookingShareText);
+        window.alert("تم نسخ تفاصيل الحجز للمشاركة.");
+      }
+    } catch {
+      // The user may close the native share sheet; no error message is needed.
+    }
+  };
+
+  const playSuccessSound = () => {
+    const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const context = new AudioContextClass();
+    const now = context.currentTime;
+    [523.25, 659.25, 783.99].forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, now + index * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.12, now + index * 0.08 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.08 + 0.35);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start(now + index * 0.08);
+      oscillator.stop(now + index * 0.08 + 0.38);
+    });
+    window.setTimeout(() => void context.close(), 650);
+  };
+
+  const toggleSuccessSound = () => {
+    setSoundEnabled(current => {
+      const next = !current;
+      if (next) playSuccessSound();
+      return next;
+    });
+  };
 
   const submitBooking = async () => {
     try {
@@ -144,10 +188,10 @@ export default function Home() {
       {bookingOpen && <div className="modal-backdrop" onClick={() => setBookingOpen(false)}><div className="booking-modal" onClick={e => e.stopPropagation()}><div className="booking-progress-head"><span>تقدم الحجز</span><strong>{step === 0 ? "حوالي دقيقتين" : step === 1 ? "حوالي دقيقة" : "آخر خطوة"} · {Math.round(progress)}%</strong></div><div className="booking-progress-track"><div className="booking-progress-fill" style={{ width: `${progress}%` }} /></div><button onClick={() => setBookingOpen(false)} className="absolute left-5 top-5 rounded-full p-2 text-[#76909b] hover:bg-[#eef7f8]" aria-label="إغلاق"><X size={20} /></button>{confirmed ? <div className="py-7">
             <div className="text-center"><div className="success-logo-wrap"><img src="/manus-storage/nqiha-logo-two-drops_c8e9d674.png" alt="شعار نقيها" className="success-logo" /></div><div className="success-icon"><Check size={34} /></div><h2 className="mt-5 text-2xl font-black">تم استلام حجزك بنجاح!</h2><p className="mx-auto mt-2 max-w-[320px] text-sm leading-7 text-[#6b8592]">احتفظ بالرقم المرجعي. سنتواصل معك قريباً لتأكيد الموعد.</p></div>
             <div className="receipt-printable">
-            <div className="mt-6 rounded-2xl border border-[#bce8eb] bg-[#effbfc] p-4 text-center"><div className="text-xs font-black text-[#527183]">الرقم المرجعي للحجز</div><div dir="ltr" className="mt-2 text-2xl font-black tracking-[0.12em] text-[#073b63]">{bookingReference ?? "—"}</div></div>
+            <div className="mt-6 rounded-2xl border border-[#bce8eb] bg-[#effbfc] p-4 text-center"><div className="text-xs font-black text-[#527183]">الرقم المرجعي للحجز</div><div dir="ltr" className="booking-reference mt-2 text-2xl font-black tracking-[0.12em] text-[#073b63]">{bookingReference ?? "—"}</div></div>
             <div className="mt-4 grid gap-3 rounded-2xl border border-[#e2eef0] bg-white p-4 text-sm"><div className="flex items-center justify-between gap-4"><span className="text-[#78909b]">الخدمة</span><strong>{selectedService}</strong></div><div className="flex items-center justify-between gap-4"><span className="text-[#78909b]">السيارة</span><strong>{selectedCar}</strong></div><div className="flex items-center justify-between gap-4"><span className="text-[#78909b]">التاريخ</span><strong dir="ltr">{bookingForm.bookingDate}</strong></div><div className="flex items-center justify-between gap-4"><span className="text-[#78909b]">الوقت</span><strong>{bookingForm.bookingTime}</strong></div><div className="flex items-start justify-between gap-4"><span className="text-[#78909b]">العنوان</span><strong className="max-w-[220px] text-left">{bookingForm.address}</strong></div><div className="flex items-center justify-between gap-4 border-t border-[#edf3f4] pt-3"><span className="font-bold text-[#78909b]">المجموع</span><strong className="text-lg text-[#073b63]">{totalWithTravel.toLocaleString()} دج</strong></div></div>
             </div>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row"><Button variant="outline" onClick={downloadReceipt} className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border-[#35c3d0] px-4 text-sm font-black text-[#168b9d] hover:bg-[#effbfc]"><Download size={17} /> تحميل الإيصال PDF</Button><a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex h-11 flex-1 items-center justify-center rounded-full bg-[#20b85a] px-4 text-sm font-black text-white hover:bg-[#149b48]">إرسال التفاصيل عبر واتساب</a><Button onClick={() => setBookingOpen(false)} className="h-11 flex-1 rounded-full bg-[#073b63] px-7 font-bold">إغلاق</Button></div>
+            <div className="mt-6 grid grid-cols-2 gap-3"><Button variant="outline" onClick={downloadReceipt} className="flex h-11 items-center justify-center gap-2 rounded-full border-[#35c3d0] px-3 text-xs font-black text-[#168b9d] hover:bg-[#effbfc]"><Download size={16} /> تحميل PDF</Button><Button variant="outline" onClick={shareBooking} className="flex h-11 items-center justify-center gap-2 rounded-full border-[#d5e6e9] px-3 text-xs font-black text-[#073b63] hover:bg-[#f1fafa]"><Share2 size={16} /> مشاركة</Button><Button type="button" variant="outline" onClick={toggleSuccessSound} className="flex h-11 items-center justify-center gap-2 rounded-full border-[#d5e6e9] px-3 text-xs font-black text-[#073b63] hover:bg-[#f1fafa]">{soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />} {soundEnabled ? "الصوت يعمل" : "تشغيل الصوت"}</Button><a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex h-11 items-center justify-center rounded-full bg-[#20b85a] px-3 text-xs font-black text-white hover:bg-[#149b48]">إرسال واتساب</a><Button onClick={() => setBookingOpen(false)} className="col-span-2 h-11 rounded-full bg-[#073b63] px-7 font-bold">إغلاق</Button></div>
           </div> : <><div className="mb-7"><p className="section-kicker">حجز سريع</p><h2 className="mt-2 text-2xl font-black">احجز غسيل سيارتك</h2></div><div className="mb-8 flex items-center gap-2">{steps.map((s, i) => <div key={s} className="flex flex-1 items-center gap-2"><div className={`step-number ${i <= step ? "active" : ""}`}>{i + 1}</div><span className={`hidden text-xs font-bold sm:block ${i <= step ? "text-[#073b63]" : "text-[#9bb0ba]"}`}>{s}</span>{i < 2 && <div className={`h-px flex-1 ${i < step ? "bg-[#35c3d0]" : "bg-[#e1ecef]"}`} />}</div>)}</div><div key={step} className={`booking-step booking-step-${step} ${step > 0 ? "booking-step-forward" : ""}`}>{step === 0 && <div className="space-y-5"><div>{services.map(s => <button key={s.title} onClick={() => setSelectedService(s.title)} className={`booking-option ${selectedService === s.title ? "selected" : ""}`}><div><div className="font-black">{s.title}</div><div className="mt-1 text-xs text-[#7a909b]">{s.desc} · {s.time}</div></div><div className="font-black">{s.title === selectedService ? displayPrice : s.price}</div></button>)}</div><div><div className="mb-3 flex items-center justify-between"><span className="text-xs font-black text-[#527183]">نوع السيارة</span><span className="text-xs font-black text-[#1397a5]">السعر يتحدث تلقائيًا</span></div><div className="grid grid-cols-3 gap-2">{carTypes.map(car => <button key={car.label} onClick={() => setSelectedCar(car.label)} className={`car-option ${selectedCar === car.label ? "selected" : ""}`}><span className="font-black">{car.label}</span><small>{car.hint}</small></button>)}</div></div></div>}{step === 1 && <div className="grid gap-4"><label className="field-label">اختار اليوم<input type="date" value={bookingForm.bookingDate} onChange={event => updateForm("bookingDate", event.target.value)} /></label><label className="field-label">الوقت المناسب<select value={bookingForm.bookingTime} onChange={event => updateForm("bookingTime", event.target.value)}><option>10:00 صباحًا</option><option>12:00 ظهرًا</option><option>02:00 مساءً</option><option>04:00 مساءً</option></select></label></div>}{step === 2 && <div className="grid gap-4"><label className="field-label">الاسم الكامل<input value={bookingForm.customerName} onChange={event => updateForm("customerName", event.target.value)} placeholder="مثال: محمد بن علي" /></label><label className="field-label">رقم الهاتف<input value={bookingForm.phone} onChange={event => updateForm("phone", event.target.value)} placeholder="05 xx xx xx xx" /></label><label className="field-label">الموقع أو العنوان<input value={bookingForm.address} onChange={event => updateForm("address", event.target.value)} placeholder="أين نجيك؟" /></label><div className="location-row"><button type="button" onClick={useMyLocation} className="location-button"><MapPin size={17} /> استخدم موقعي الحالي</button><span>{location ? `رسوم التنقل: ${travelFee} دج` : "حدد موقعك لحساب التنقل"}</span></div><div className="payment-box"><div className="mb-3 text-xs font-black text-[#527183]">طريقة الدفع</div><div className="grid grid-cols-3 gap-2">{([["cash", "كاش"], ["cib", "CIB"], ["baridimob", "بريدي موب"]] as const).map(([value, label]) => <button type="button" key={value} onClick={() => updateForm("paymentMethod", value)} className={`payment-option ${bookingForm.paymentMethod === value ? "selected" : ""}`}>{label}</button>)}</div><div className="mt-3 flex items-center justify-between border-t border-[#e5eff1] pt-3 text-sm"><span className="font-bold text-[#6c8490]">المجموع</span><strong className="text-lg text-[#073b63]">{totalWithTravel} دج</strong></div></div></div>}</div><div className="mt-8 flex gap-3">{step > 0 && <Button variant="outline" onClick={() => setStep(step - 1)} className="h-12 flex-1 rounded-full border-[#d5e6e9] font-bold">رجوع</Button>}<Button disabled={createBookingMutation.isPending || (step === 2 && (!bookingForm.customerName.trim() || !/^(0|\+213)[5-7][0-9]{8}$/.test(bookingForm.phone.replace(/[\s-]/g, "")) || !bookingForm.address.trim()))} onClick={() => step < 2 ? setStep(step + 1) : submitBooking()} className="h-12 flex-1 rounded-full bg-[#073b63] font-bold hover:bg-[#0b527f]">{createBookingMutation.isPending ? "جارٍ تأكيد الحجز…" : step < 2 ? "التالي" : "تأكيد الحجز"}<ArrowLeft className="mr-2" size={17} /></Button></div>{createBookingMutation.error && <p role="alert" className="mt-3 text-center text-xs font-bold text-red-600">{createBookingMutation.error.message.includes("موعد") ? createBookingMutation.error.message : "تعذر التحقق من بيانات الحجز. راجع الوقت ورقم الهاتف وحاول مجدداً."}</p>}</>}</div></div>}
     </main>
   );

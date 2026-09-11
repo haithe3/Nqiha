@@ -50,3 +50,6 @@ button.bg-\[\#073b63\] { color: #fff !important; }
   .receipt-printable, .receipt-printable * { visibility: visible !important; }
   .receipt-printable { position: absolute; inset: 0; width: 100%; padding: 28px; background: #fff; color: #073b63; }
 }
+
+.booking-reference { animation:referencePop .45s cubic-bezier(.23,1,.32,1) both; }
+@keyframes referencePop { from { opacity:0; transform:translateY(8px) scale(.9); } to { opacity:1; transform:none; } }
