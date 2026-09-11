@@ -12,7 +12,7 @@ const bookingInput = z.object({
   service: z.string().min(2).max(120),
   carType: z.string().min(2).max(80),
   bookingDate: z.string().date().refine(value => value >= new Date().toISOString().slice(0, 10), "لا يمكن اختيار تاريخ سابق"),
-  bookingTime: z.enum(["10:00 صباحًا", "12:00 ظهرًا", "02:00 مساءً", "04:00 مساءً"]),
+  bookingTime: z.string().transform(value => ({ "10:00": "10:00 صباحًا", "12:00": "12:00 ظهرًا", "02:00": "02:00 مساءً", "04:00": "04:00 مساءً" }[value] ?? value)).pipe(z.enum(["10:00 صباحًا", "12:00 ظهرًا", "02:00 مساءً", "04:00 مساءً"])),
   address: z.string().min(3),
   latitude: z.string().max(32).optional(),
   longitude: z.string().max(32).optional(),
