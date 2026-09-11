@@ -30,3 +30,9 @@ button.bg-\[\#073b63\] { color: #fff !important; }
 @keyframes stepInForward { from { opacity:0; transform:translateX(-16px) scale(.98); } to { opacity:1; transform:none; } }
 @media (max-width:640px) { .container { width:min(100% - 28px,1180px); }.booking-modal { padding:25px 20px; }.hero-grid h1 { font-size:42px; } }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; } }
+
+@media print {
+  body * { visibility: hidden !important; }
+  .receipt-printable, .receipt-printable * { visibility: visible !important; }
+  .receipt-printable { position: absolute; inset: 0; width: 100%; padding: 28px; background: #fff; color: #073b63; }
+}
