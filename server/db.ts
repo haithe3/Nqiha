@@ -98,6 +98,12 @@ export async function createBooking(booking: InsertBooking) {
   return Number(result[0].insertId);
 }
 
+export async function listBookingsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(bookings).where(eq(bookings.userId, userId)).orderBy(desc(bookings.createdAt)).limit(100);
+}
+
 export async function listBookings() {
   const db = await getDb();
   if (!db) return [];

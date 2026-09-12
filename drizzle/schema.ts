@@ -27,6 +27,7 @@ export type InsertUser = typeof users.$inferInsert;
 
 export const bookings = mysqlTable("bookings", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
   customerName: varchar("customerName", { length: 160 }).notNull(),
   phone: varchar("phone", { length: 32 }).notNull(),
   service: varchar("service", { length: 120 }).notNull(),

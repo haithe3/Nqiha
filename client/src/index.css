@@ -55,3 +55,27 @@ button.bg-\[\#073b63\] { color: #fff !important; }
 @keyframes referencePop { from { opacity:0; transform:translateY(8px) scale(.9); } to { opacity:1; transform:none; } }
 
 .rating-star { color:#cbdde1; transition:transform .18s ease, color .18s ease; } .rating-star:hover, .rating-star.selected { color:#f2b63f; transform:translateY(-2px) scale(1.08); }
+
+.phone-number { direction:ltr; unicode-bidi:isolate; white-space:nowrap; display:inline-block; }
+.site-nav a { color:#073b63; transition:color .2s ease, transform .2s ease; white-space:nowrap; }
+.site-nav a:hover, .site-nav a:focus-visible { color:#1397a5; transform:translateY(-1px); }
+.site-footer a { transition:color .2s ease; }
+.site-footer a:hover { color:#1397a5; }
+.footer-title { margin-bottom:16px; color:#073b63; font-size:15px; font-weight:900; }
+.footer-links { display:grid; gap:11px; color:#617d90; font-size:13px; font-weight:700; }
+.footer-links a { display:flex; align-items:center; gap:8px; }
+.time-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.time-pill { min-height:43px; border:1px solid #dcebed; border-radius:999px; background:#fff; color:#527183; font-size:11px; font-weight:900; transition:background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
+.time-pill:hover, .time-pill.selected { border-color:#35c3d0; background:#dff8f9; color:#073b63; transform:translateY(-2px); }
+.account-page { background:radial-gradient(circle at 12% 8%,#e2f8f8 0,transparent 28%),#f7fbfc; color:#073b63; }
+.account-card { border:1px solid #e1eef1; border-radius:28px; background:#fff; padding:28px; box-shadow:0 20px 40px #073b6310; }
+.account-back-link { display:inline-flex; align-items:center; gap:8px; color:#073b63; font-size:13px; font-weight:900; transition:color .2s ease; }
+.account-back-link:hover { color:#1397a5; }
+.account-logo { display:flex; width:54px; height:54px; align-items:center; justify-content:center; border-radius:18px 18px 18px 6px; background:#e5f9fa; color:#1397a5; }
+.account-label { display:grid; gap:8px; color:#527183; font-size:12px; font-weight:900; }
+.account-label input { height:52px; border:1px solid #dcebed; border-radius:18px; background:#fbfefe; padding:0 16px; color:#073b63; outline:none; direction:ltr; text-align:left; transition:border-color .2s ease, box-shadow .2s ease; }
+.account-label input:focus { border-color:#35c3d0; box-shadow:0 0 0 4px #dff7f8; }
+.points-card { display:flex; align-items:center; gap:10px; border-radius:22px; background:#073b63; padding:14px 18px; color:#fff; box-shadow:0 14px 28px #073b6322; }
+.points-card > svg { color:#5ee4ed; }.points-card span,.points-card strong { display:block; }.points-card span { font-size:10px; color:#b5d0d9; }.points-card strong { margin-top:3px; font-size:16px; }
+.booking-history-row { display:flex; align-items:center; justify-content:space-between; gap:16px; border:1px solid #e4eff1; border-radius:18px; padding:16px; }.booking-history-row strong { font-size:13px; }.booking-history-row span { display:inline-flex; align-items:center; gap:4px; }.empty-account-state { display:grid; justify-items:center; gap:10px; padding:48px 12px; color:#8a9da6; }.empty-account-state svg { color:#35c3d0; }
+@media (max-width:640px) { .time-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.account-card { padding:22px 18px; }.booking-history-row { align-items:flex-start; }.points-card { width:100%; justify-content:center; } }

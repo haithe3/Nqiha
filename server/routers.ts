@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
-import { createBooking, listBookings, updateBookingStatus } from "./db";
+import { createBooking, listBookings, listBookingsByUser, updateBookingStatus } from "./db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -57,10 +57,15 @@ export const appRouter = router({
     }),
   }),
   bookings: router({
-    create: publicProcedure.input(bookingInput).mutation(async ({ input }) => {
+    create: publicProcedure.input(bookingInput).mutation(async ({ ctx, input }) => {
       const { travelFee, totalPrice } = calculateBookingTotal(input.service, input.carType, input.latitude, input.longitude);
-      const id = await createBooking({ ...input, travelFee, totalPrice, slotKey: `${input.bookingDate}|${input.bookingTime}`, status: "pending" });
+      const id = await createBooking({ ...input, userId: ctx.user?.id, travelFee, totalPrice, slotKey: `${input.bookingDate}|${input.bookingTime}`, status: "pending" });
       return { id, success: true } as const;
+    }),
+    mine: protectedProcedure.query(async ({ ctx }) => {
+      const bookings = await listBookingsByUser(ctx.user.id);
+      const completedCount = bookings.filter(booking => booking.status === "completed").length;
+      return { bookings, loyaltyPoints: completedCount * 100 };
     }),
     list: adminOnly.query(() => listBookings()),
     updateStatus: adminOnly.input(z.object({ id: z.number().int().positive(), status: z.enum(["pending", "confirmed", "completed", "cancelled"]) })).mutation(({ input }) => updateBookingStatus(input.id, input.status)),

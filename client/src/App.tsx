@@ -6,11 +6,12 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import Account from "./pages/Account";
 
 const Admin = lazy(() => import("./pages/Admin"));
 
 function Router() {
-  return <Suspense fallback={<div dir="rtl" className="flex min-h-screen items-center justify-center bg-[#f7fbfc] text-[#073b63]">جارٍ تحميل الصفحة…</div>}><Switch><Route path="/" component={Home} /><Route path="/admin" component={Admin} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch></Suspense>;
+  return <Suspense fallback={<div dir="rtl" className="flex min-h-screen items-center justify-center bg-[#f7fbfc] text-[#073b63]">جارٍ تحميل الصفحة…</div>}><Switch><Route path="/" component={Home} /><Route path="/account" component={Account} /><Route path="/admin" component={Admin} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch></Suspense>;
 }
 
 function App() {
