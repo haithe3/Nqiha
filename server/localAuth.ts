@@ -8,7 +8,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 
 export const LOCAL_SESSION_COOKIE = "nqiha_session";
 export const OWNER_USERNAME = process.env.OWNER_USERNAME ?? "naqiha_mobile_wash";
-const OWNER_PASSWORD_HASH = process.env.OWNER_PASSWORD_HASH ?? "$2b$12$CeN7GB9y8Oc3SkJhHuQ72OjfTlTiEM13jfWlC6Zs7FfKdO431Cjgy";
+const OWNER_PASSWORD_HASH = process.env.OWNER_PASSWORD_HASH ?? "$2b$12$SzBFUbGhJyhEt85SJnC6sOxRII3V6X4IUChdG.VhNJrXNxlbt7R1.";
 
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
