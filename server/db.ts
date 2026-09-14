@@ -104,6 +104,13 @@ export async function listBookingsByUser(userId: number) {
   return db.select().from(bookings).where(eq(bookings.userId, userId)).orderBy(desc(bookings.createdAt)).limit(100);
 }
 
+export async function getBookingById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(bookings).where(eq(bookings.id, id)).limit(1);
+  return result[0];
+}
+
 export async function listBookings() {
   const db = await getDb();
   if (!db) return [];

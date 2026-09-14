@@ -29,6 +29,20 @@
       "when": 1789180520982,
       "tag": "0003_fair_zarda",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1789262497725,
+      "tag": "0004_clever_wilson_fisk",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1789262855811,
+      "tag": "0005_fair_the_initiative",
+      "breakpoints": true
     }
   ]
 }

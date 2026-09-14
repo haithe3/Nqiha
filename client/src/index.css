@@ -79,3 +79,6 @@ button.bg-\[\#073b63\] { color: #fff !important; }
 .points-card > svg { color:#5ee4ed; }.points-card span,.points-card strong { display:block; }.points-card span { font-size:10px; color:#b5d0d9; }.points-card strong { margin-top:3px; font-size:16px; }
 .booking-history-row { display:flex; align-items:center; justify-content:space-between; gap:16px; border:1px solid #e4eff1; border-radius:18px; padding:16px; }.booking-history-row strong { font-size:13px; }.booking-history-row span { display:inline-flex; align-items:center; gap:4px; }.empty-account-state { display:grid; justify-items:center; gap:10px; padding:48px 12px; color:#8a9da6; }.empty-account-state svg { color:#35c3d0; }
 @media (max-width:640px) { .time-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.account-card { padding:22px 18px; }.booking-history-row { align-items:flex-start; }.points-card { width:100%; justify-content:center; } }
+.map-picker-leaflet { overflow:hidden; border:1px solid #dcebed; border-radius:18px; background:#eef8f9; z-index:0; }
+.map-picker-leaflet .leaflet-container { height:100%; width:100%; font-family:'Cairo',sans-serif; }
+.map-picker-leaflet .leaflet-control-attribution { font-size:8px; }
