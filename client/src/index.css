@@ -82,3 +82,22 @@ button.bg-\[\#073b63\] { color: #fff !important; }
 .map-picker-leaflet { overflow:hidden; border:1px solid #dcebed; border-radius:18px; background:#eef8f9; z-index:0; }
 .map-picker-leaflet .leaflet-container { height:100%; width:100%; font-family:'Cairo',sans-serif; }
 .map-picker-leaflet .leaflet-control-attribution { font-size:8px; }
+
+
+.booking-time-select {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid #cfe5e9;
+  border-radius: 18px;
+  background: #fff;
+  color: #073b63;
+  padding: 0 16px;
+  font: inherit;
+  font-weight: 800;
+  text-align: right;
+  direction: rtl;
+  outline: none;
+  transition: border-color .2s cubic-bezier(.23,1,.32,1), box-shadow .2s cubic-bezier(.23,1,.32,1);
+}
+.booking-time-select:focus { border-color: #35c3d0; box-shadow: 0 0 0 4px #35c3d022; }
+.booking-time-select:disabled { opacity: .6; cursor: wait; }

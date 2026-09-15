@@ -1,4 +1,4 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, not } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -12,10 +12,12 @@ import { bookings, users, visitorEvents } from "../drizzle/schema";
 
 export const BOOKING_TIMES = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00"] as const;
 const recentBookingAttempts = new Map<string, number>();
+const normalizeDigits = (value: string) => value.replace(/[٠-٩]/g, digit => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit))).replace(/[۰-۹]/g, digit => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
+const canonicalPhone = (value: string) => normalizeDigits(value).replace(/[\s-]/g, "");
 
 const bookingInput = z.object({
   customerName: z.string().min(2).max(160),
-  phone: z.string().min(8).max(32).transform(value => value.replace(/[\s-]/g, "")).pipe(z.string().regex(/^(0|\+213)[5-7]\d{8}$/, "رقم الهاتف غير صالح")),
+  phone: z.string().min(8).max(32).transform(canonicalPhone).pipe(z.string().regex(/^(0|\+213)[5-7]\d{8}$/, "رقم الهاتف غير صالح")),
   service: z.string().min(2).max(120),
   carType: z.string().min(2).max(80),
   bookingDate: z.string().date().refine(value => value >= new Date().toISOString().slice(0, 10), "لا يمكن اختيار تاريخ سابق"),
@@ -77,6 +79,13 @@ export const appRouter = router({
     logout: publicProcedure.mutation(async ({ ctx }) => { ctx.res.clearCookie(COOKIE_NAME, { ...getSessionCookieOptions(ctx.req), maxAge: -1 }); await clearLocalSession(ctx.req, ctx.res); return { success: true } as const; }),
   }),
   bookings: router({
+    availableTimes: publicProcedure.input(z.object({ bookingDate: z.string().date() })).query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [...BOOKING_TIMES];
+      const booked = await db.select({ bookingTime: bookings.bookingTime }).from(bookings).where(and(eq(bookings.bookingDate, input.bookingDate), not(eq(bookings.status, "cancelled"))));
+      const bookedTimes = new Set(booked.map(row => row.bookingTime));
+      return BOOKING_TIMES.filter(time => !bookedTimes.has(time));
+    }),
     create: publicProcedure.input(bookingInput).mutation(async ({ ctx, input }) => {
       const ip = String(ctx.req.headers["x-forwarded-for"] ?? ctx.req.ip ?? "unknown").split(",")[0];
       const lastAttempt = recentBookingAttempts.get(ip) ?? 0;
