@@ -101,3 +101,8 @@ button.bg-\[\#073b63\] { color: #fff !important; }
 }
 .booking-time-select:focus { border-color: #35c3d0; box-shadow: 0 0 0 4px #35c3d022; }
 .booking-time-select:disabled { opacity: .6; cursor: wait; }
+
+.password-field { position: relative; }
+.password-field input { padding-inline-end: 52px; }
+.password-toggle { position: absolute; inset-inline-end: 14px; top: 50%; display: inline-flex; transform: translateY(-50%); color: #527183; transition: color .2s ease, transform .2s ease; }
+.password-toggle:hover, .password-toggle:focus-visible { color: #073b63; transform: translateY(-50%) scale(1.08); }
